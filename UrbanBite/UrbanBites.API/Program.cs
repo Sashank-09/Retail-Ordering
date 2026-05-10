@@ -108,6 +108,10 @@ builder.Services.AddCors(options =>
 // ── Rate Limiting ─────────────────────────────────────
 builder.Services.AddRateLimitingPolicies();
 
+// ── Render PORT binding ───────────────────────────────
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+builder.WebHost.UseUrls($"http://*:{port}");
+
 var app = builder.Build();
 
 // ── Seed Database on Startup ──────────────────────────
@@ -133,7 +137,7 @@ app.UseSwaggerUI(options =>
     options.RoutePrefix = "swagger";
 });
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseCors("AllowAngular");
 app.UseRateLimiter();
 app.UseAuthentication();
