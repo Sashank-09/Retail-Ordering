@@ -21,7 +21,8 @@ namespace UrbanBites.Infrastructure.Services
             decimal totalAmount,
             decimal discountAmount,
             string deliveryAddress,
-            List<OrderEmailItem> items)
+            List<OrderEmailItem> items,
+            string? transactionId = null)
         {
             try
             {
@@ -44,6 +45,13 @@ namespace UrbanBites.Infrastructure.Services
                     </tr>
                 """ : "";
 
+                var paymentRow = !string.IsNullOrEmpty(transactionId) ? $"""
+                    <tr>
+                      <td colspan="2" style="padding:8px 0;color:#555;font-size:13px;">💳 Payment ID</td>
+                      <td style="padding:8px 0;color:#555;font-size:13px;text-align:right;font-family:monospace;">{transactionId}</td>
+                    </tr>
+                """ : "";
+
                 var html = $"""
                     <html>
                     <body style="font-family:Arial,sans-serif;background:#f4f4f4;padding:20px;">
@@ -52,11 +60,11 @@ namespace UrbanBites.Infrastructure.Services
                         <h2 style="color:#2e7d32;">✅ Order Confirmed!</h2>
                         <p>Hi <b>{customerName}</b>, your order <b>#{orderId[..8].ToUpper()}</b> has been placed successfully.</p>
                         <hr style="border:none;border-top:1px solid #eee;margin:20px 0;">
-                        <table width="100%">{itemsHtml}{discountRow}</table>
-                        <p style="font-size:18px;font-weight:bold;margin-top:20px;">Total Amount: ₹{totalAmount}</p>
+                        <table width="100%">{itemsHtml}{discountRow}{paymentRow}</table>
+                        <p style="font-size:18px;font-weight:bold;margin-top:20px;">Total Paid: ₹{totalAmount}</p>
                         <p style="color:#666;">📍 Delivering to: {deliveryAddress}</p>
                         <div style="margin-top:30px;text-align:center;">
-                           <a href="http://localhost:4200/my-bookings" style="background:#FF6B35;color:white;padding:12px 24px;text-decoration:none;border-radius:8px;font-weight:bold;">Track Order</a>
+                           <a href="https://retail-ordering.vercel.app/my-bookings" style="background:#FF6B35;color:white;padding:12px 24px;text-decoration:none;border-radius:8px;font-weight:bold;">Track Order</a>
                         </div>
                       </div>
                     </body>

@@ -183,7 +183,8 @@ namespace UrbanBites.Application.Services
                     order.TotalAmount,
                     order.DiscountAmount,
                     order.DeliveryAddress,
-                    emailItems);
+                    emailItems,
+                    order.TransactionId);
 
                 Console.WriteLine($"[EMAIL] ✅ Email sent successfully!");
             }

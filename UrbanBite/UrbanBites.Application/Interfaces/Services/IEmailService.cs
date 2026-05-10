@@ -1,4 +1,4 @@
-﻿namespace UrbanBites.Application.Interfaces.Services
+namespace UrbanBites.Application.Interfaces.Services
 {
     public interface IEmailService
     {
@@ -9,7 +9,8 @@
     decimal totalAmount,
     decimal discountAmount,
     string deliveryAddress,
-    List<OrderEmailItem> items);
+    List<OrderEmailItem> items,
+    string? transactionId = null);
 
         Task SendOtpEmailAsync(string toEmail, string otpCode);
         Task SendWelcomeEmailAsync(string toEmail, string customerName);
