@@ -148,7 +148,7 @@ namespace UrbanBites.Infrastructure.Services
                         <p>Hi <b>{customerName}</b>,</p>
                         <p>We're thrilled to have you! Start exploring fresh food from top brands and get it delivered fast.</p>
                         <p style="margin:30px 0;text-align:center;">
-                          <a href="http://localhost:4200/products" style="background:#FF6B35;color:white;padding:14px 28px;text-decoration:none;border-radius:8px;font-weight:bold;">Browse Menu</a>
+                          <a href="https://retail-ordering.vercel.app/products" style="background:#FF6B35;color:white;padding:14px 28px;text-decoration:none;border-radius:8px;font-weight:bold;">Browse Menu</a>
                         </p>
                         <p style="color:#888;font-size:12px;border-top:1px solid #eee;padding-top:20px;">Use code <b>WELCOME20</b> for 20% off your first order!</p>
                       </div>
