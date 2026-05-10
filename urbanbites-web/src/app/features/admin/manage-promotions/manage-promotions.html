@@ -1,0 +1,128 @@
+<div class="admin-page">
+  <div class="admin-header">
+    <div>
+      <h1 class="admin-title">📣 Manage Promotions</h1>
+      <p class="admin-subtitle">Create and manage banner promotions shown to customers.</p>
+    </div>
+    <button class="btn btn-primary" (click)="openForm()">＋ Add Promotion</button>
+  </div>
+
+  @if (deleteError) {
+    <div class="alert alert-danger">{{ deleteError }}</div>
+  }
+
+  @if (isLoading) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading promotions…</p>
+    </div>
+  } @else if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  } @else {
+
+    @if (promotions.length === 0) {
+      <div class="empty-card">
+        <div class="empty-icon">📣</div>
+        <p>No promotions yet. Create one to get started.</p>
+        <button class="btn btn-primary" (click)="openForm()">＋ Add Promotion</button>
+      </div>
+    } @else {
+      <div class="promo-grid">
+        @for (promo of promotions; track promo.id) {
+          <div class="promo-card">
+            <div class="promo-image-wrap">
+              <img
+                class="promo-image"
+                [src]="promo.imageUrl || 'https://placehold.co/400x180/fff7ed/f97316?text=Promo'"
+                [alt]="promo.title"
+                onerror="this.src='https://placehold.co/400x180/fff7ed/f97316?text=Promo'"
+              />
+              <span class="promo-status-pill" [class]="isActive(promo) ? 'active' : 'inactive'">
+                {{ getStatusLabel(promo) }}
+              </span>
+            </div>
+            <div class="promo-body">
+              <div class="promo-top">
+                <h3 class="promo-title">{{ promo.title }}</h3>
+                <span class="discount-chip">{{ promo.discountPercent }}% OFF</span>
+              </div>
+              <p class="promo-desc">{{ promo.description }}</p>
+              <div class="promo-dates">
+                <span>📅 {{ promo.startDate | date:'dd MMM yyyy' }}</span>
+                <span class="date-arrow">→</span>
+                <span>{{ promo.endDate | date:'dd MMM yyyy' }}</span>
+              </div>
+            </div>
+            <div class="promo-footer">
+              <button
+                class="btn btn-sm btn-danger"
+                [disabled]="deletingId === promo.id"
+                (click)="deletePromotion(promo.id)"
+              >
+                {{ deletingId === promo.id ? 'Deleting…' : '🗑️ Delete' }}
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
+
+<!-- Add Promotion Modal -->
+@if (showForm) {
+  <div class="modal-backdrop" (click)="closeForm()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>📣 New Promotion</h2>
+        <button class="modal-close" (click)="closeForm()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        @if (saveError) {
+          <div class="alert alert-danger">{{ saveError }}</div>
+        }
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Title</label>
+            <input type="text" [(ngModel)]="form.title" placeholder="e.g. Weekend Special" />
+          </div>
+          <div class="form-group full">
+            <label>Description</label>
+            <textarea [(ngModel)]="form.description" rows="2" placeholder="Describe the promotion…"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Discount (%)</label>
+            <input type="number" [(ngModel)]="form.discountPercent" min="1" max="100" />
+          </div>
+          <div class="form-group">
+            <label>Image URL</label>
+            <input type="url" [(ngModel)]="form.imageUrl" placeholder="https://…" />
+          </div>
+          <div class="form-group">
+            <label>Start Date</label>
+            <input type="datetime-local" [(ngModel)]="form.startDate" />
+          </div>
+          <div class="form-group">
+            <label>End Date</label>
+            <input type="datetime-local" [(ngModel)]="form.endDate" />
+          </div>
+          <div class="form-group full toggle-group">
+            <label class="toggle-label">
+              <input type="checkbox" [(ngModel)]="form.isActive" />
+              <span class="toggle-slider"></span>
+              <span>Active</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" (click)="closeForm()">Cancel</button>
+        <button class="btn btn-primary" [disabled]="isSaving" (click)="savePromotion()">
+          {{ isSaving ? 'Creating…' : '＋ Create Promotion' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

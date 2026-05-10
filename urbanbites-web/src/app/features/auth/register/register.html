@@ -1,0 +1,187 @@
+<div class="auth-page">
+
+  <div class="auth-left">
+    <div class="auth-brand">
+      <div class="brand-logo">🍕</div>
+      <h1>Join UrbanBites</h1>
+      <p>Create your account and start ordering</p>
+    </div>
+    <div class="auth-perks">
+      <div class="perk">
+        <span>✅</span>
+        <span>Free account, no hidden charges</span>
+      </div>
+      <div class="perk">
+        <span>✅</span>
+        <span>Earn loyalty points on every order</span>
+      </div>
+      <div class="perk">
+        <span>✅</span>
+        <span>Exclusive member-only deals</span>
+      </div>
+      <div class="perk">
+        <span>✅</span>
+        <span>Track all your orders in one place</span>
+      </div>
+      <div class="perk">
+        <span>✅</span>
+        <span>Save favourite addresses</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-card">
+
+      <div class="auth-header">
+        <h2>Create account</h2>
+        <p>Fill in the details below to get started</p>
+      </div>
+
+      @if (errorMessage) {
+        <div class="alert alert-error">⚠️ {{ errorMessage }}</div>
+      }
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+        <div class="form-group">
+          <label for="fullName">Full name</label>
+          <input
+            id="fullName"
+            type="text"
+            formControlName="fullName"
+            placeholder="John Doe"
+            [class.error]="fullName.invalid && fullName.touched"
+            autocomplete="name"
+          />
+          @if (fullName.invalid && fullName.touched) {
+            <span class="error-msg">
+              @if (fullName.errors?.['required']) { Full name is required. }
+              @else if (fullName.errors?.['minlength']) {
+                Name must be at least 3 characters.
+              }
+            </span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="you@example.com"
+            [class.error]="email.invalid && email.touched"
+            autocomplete="email"
+          />
+          @if (email.invalid && email.touched) {
+            <span class="error-msg">
+              @if (email.errors?.['required']) { Email is required. }
+              @else if (email.errors?.['email']) { Enter a valid email. }
+            </span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone number</label>
+          <input
+            id="phone"
+            type="tel"
+            formControlName="phone"
+            placeholder="10-digit mobile number"
+            [class.error]="phone.invalid && phone.touched"
+            autocomplete="tel"
+          />
+          @if (phone.invalid && phone.touched) {
+            <span class="error-msg">
+              @if (phone.errors?.['required']) { Phone number is required. }
+              @else if (phone.errors?.['pattern']) {
+                Enter a valid 10-digit number.
+              }
+            </span>
+          }
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-icon-wrapper">
+              <input
+                id="password"
+                [type]="showPassword ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="Min 8 characters"
+                [class.error]="password.invalid && password.touched"
+                autocomplete="new-password"
+              />
+              <button type="button" class="toggle-pw"
+                      (click)="showPassword = !showPassword">
+                {{ showPassword ? '🙈' : '👁️' }}
+              </button>
+            </div>
+            @if (password.invalid && password.touched) {
+              <span class="error-msg">
+                @if (password.errors?.['required']) { Password is required. }
+                @else if (password.errors?.['minlength']) {
+                  Minimum 8 characters.
+                }
+                @else if (password.errors?.['pattern']) {
+                  Must contain uppercase letter and number.
+                }
+              </span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm password</label>
+            <div class="input-icon-wrapper">
+              <input
+                id="confirmPassword"
+                [type]="showConfirm ? 'text' : 'password'"
+                formControlName="confirmPassword"
+                placeholder="Re-enter password"
+                [class.error]="(confirmPassword.invalid || registerForm.errors?.['passwordMismatch'])
+                                && confirmPassword.touched"
+                autocomplete="new-password"
+              />
+              <button type="button" class="toggle-pw"
+                      (click)="showConfirm = !showConfirm">
+                {{ showConfirm ? '🙈' : '👁️' }}
+              </button>
+            </div>
+            @if (confirmPassword.touched && registerForm.errors?.['passwordMismatch']) {
+              <span class="error-msg">Passwords do not match.</span>
+            }
+          </div>
+        </div>
+
+        <div class="password-hint">
+          <span [class.met]="!password.errors?.['minlength'] && password.value">
+            ✓ 8+ characters
+          </span>
+          <span [class.met]="!password.errors?.['pattern'] && password.value">
+            ✓ Uppercase + number
+          </span>
+          <span [class.met]="!registerForm.errors?.['passwordMismatch'] && confirmPassword.value">
+            ✓ Passwords match
+          </span>
+        </div>
+
+        <button type="submit" class="btn-submit" [disabled]="isLoading">
+          @if (isLoading) {
+            <span class="btn-spinner"></span> Creating account...
+          } @else {
+            Create Account
+          }
+        </button>
+
+      </form>
+
+      <p class="auth-switch">
+        Already have an account?
+        <a routerLink="/auth/login">Sign in</a>
+      </p>
+
+    </div>
+  </div>
+</div>

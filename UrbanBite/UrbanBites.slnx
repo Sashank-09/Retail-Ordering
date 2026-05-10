@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="UrbanBites.API/UrbanBites.API.csproj" />
+  <Project Path="UrbanBites.Application/UrbanBites.Application.csproj" />
+  <Project Path="UrbanBites.Domain/UrbanBites.Domain.csproj" />
+  <Project Path="UrbanBites.Infrastructure/UrbanBites.Infrastructure.csproj" />
+</Solution>

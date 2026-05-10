@@ -1,0 +1,173 @@
+<div class="admin-page">
+  <div class="admin-header">
+    <div>
+      <h1 class="admin-title">🍔 Manage Products</h1>
+      <p class="admin-subtitle">Add, edit or remove products from your catalogue.</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreate()">＋ Add Product</button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <input
+      class="search-input"
+      type="text"
+      placeholder="🔍 Search products…"
+      [(ngModel)]="searchTerm"
+      (input)="applyFilters()"
+    />
+    <select class="filter-select" [(ngModel)]="selectedBrandFilter" (change)="applyFilters()">
+      <option value="">All Brands</option>
+      @for (b of brands; track b.id) {
+        <option [value]="b.name">{{ b.name }}</option>
+      }
+    </select>
+  </div>
+
+  @if (deleteError) {
+    <div class="alert alert-danger">{{ deleteError }}</div>
+  }
+
+  @if (isLoading) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading products…</p>
+    </div>
+  } @else if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  } @else {
+    <div class="admin-card">
+      <div class="card-header">
+        <h2 class="card-title">
+          Products <span class="count-badge">{{ filteredProducts.length }}</span>
+        </h2>
+      </div>
+
+      @if (filteredProducts.length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">📦</div>
+          <p>No products found.</p>
+        </div>
+      } @else {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Brand</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Packaging</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (product of filteredProducts; track product.id) {
+                <tr>
+                  <td>
+                    <img class="product-thumb" [src]="product.imageUrl" [alt]="product.name"
+                         onerror="this.src='https://placehold.co/48x48/f1f5f9/64748b?text=?'" />
+                  </td>
+                  <td class="fw-600">{{ product.name }}</td>
+                  <td>{{ product.brandName }}</td>
+                  <td>{{ product.categoryName }}</td>
+                  <td class="fw-600">₹{{ product.price }}</td>
+                  <td>
+                    <span class="stock-badge" [class.low]="product.stockCount < 5">
+                      {{ product.stockCount }}
+                    </span>
+                  </td>
+                  <td class="text-muted">{{ product.packaging }}</td>
+                  <td>
+                    <div class="action-btns">
+                      <button class="btn btn-sm btn-outline" (click)="openEdit(product)">✏️ Edit</button>
+                      <button
+                        class="btn btn-sm btn-danger"
+                        [disabled]="deletingId === product.id"
+                        (click)="deleteProduct(product.id)"
+                      >
+                        {{ deletingId === product.id ? '…' : '🗑️' }}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Create / Edit Modal -->
+@if (formMode) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ formMode === 'create' ? '＋ Add Product' : '✏️ Edit Product' }}</h2>
+        <button class="modal-close" (click)="closeModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        @if (saveError) {
+          <div class="alert alert-danger">{{ saveError }}</div>
+        }
+
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Product Name</label>
+            <input type="text" [(ngModel)]="form.name" placeholder="e.g. Zinger Burger" />
+          </div>
+          <div class="form-group full">
+            <label>Description</label>
+            <textarea [(ngModel)]="form.description" rows="3" placeholder="Short description…"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Price (₹)</label>
+            <input type="number" [(ngModel)]="form.price" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Stock Count</label>
+            <input type="number" [(ngModel)]="form.stockCount" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Brand</label>
+            <select [(ngModel)]="form.brandId" (change)="onBrandChange()" [disabled]="formMode === 'edit'">
+              <option value="">Select brand</option>
+              @for (b of brands; track b.id) {
+                <option [value]="b.id">{{ b.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <select [(ngModel)]="form.categoryId" [disabled]="formMode === 'edit'">
+              <option value="">Select category</option>
+              @for (c of filteredCategories; track c.id) {
+                <option [value]="c.id">{{ c.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Packaging</label>
+            <input type="text" [(ngModel)]="form.packaging" placeholder="e.g. Box, Wrap" />
+          </div>
+          <div class="form-group">
+            <label>Image URL</label>
+            <input type="url" [(ngModel)]="form.imageUrl" placeholder="https://…" />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" (click)="closeModal()">Cancel</button>
+        <button class="btn btn-primary" [disabled]="isSaving" (click)="saveProduct()">
+          {{ isSaving ? 'Saving…' : (formMode === 'create' ? '＋ Add Product' : '💾 Save Changes') }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,138 @@
+<div class="detail-page">
+  <div class="container">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a routerLink="/">Home</a>
+      <span>›</span>
+      <a routerLink="/products">Products</a>
+      <span>›</span>
+      <span>{{ product?.name }}</span>
+    </div>
+
+    @if (isLoading) {
+      <div class="detail-skeleton">
+        <div class="skeleton-img"></div>
+        <div class="skeleton-info">
+          <div class="skeleton-line w60"></div>
+          <div class="skeleton-line w40"></div>
+          <div class="skeleton-line w80"></div>
+          <div class="skeleton-line w80"></div>
+          <div class="skeleton-line w50"></div>
+        </div>
+      </div>
+    } @else if (product) {
+
+      <div class="detail-card">
+
+        <!-- Product Image -->
+        <div class="detail-img-wrap">
+          <img
+            [src]="product.imageUrl"
+            [alt]="product.name"
+            onerror="this.src='https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600'"
+          />
+          @if (product.stockCount === 0) {
+            <div class="out-badge">Out of Stock</div>
+          }
+        </div>
+
+        <!-- Product Info -->
+        <div class="detail-info">
+
+          <div class="detail-tags">
+            <span class="tag-brand">{{ product.brandName }}</span>
+            <span class="tag-cat">{{ product.categoryName }}</span>
+          </div>
+
+          <h1>{{ product.name }}</h1>
+
+          <p class="detail-desc">{{ product.description }}</p>
+
+          <div class="detail-meta">
+            <div class="meta-item">
+              <span class="meta-label">Packaging</span>
+              <span class="meta-value">📦 {{ product.packaging }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Availability</span>
+              <span class="meta-value"
+                    [class.in-stock]="product.stockCount > 0"
+                    [class.no-stock]="product.stockCount === 0">
+                {{ product.stockCount > 0
+                   ? '✓ In Stock (' + product.stockCount + ' left)'
+                   : '✕ Out of Stock' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="detail-price">₹{{ product.price }}</div>
+
+          @if (errorMessage) {
+            <div class="alert-error">⚠️ {{ errorMessage }}</div>
+          }
+
+          @if (product.stockCount > 0) {
+            <div class="qty-row">
+              <span class="qty-label">Quantity</span>
+              <div class="qty-control">
+                <button (click)="decreaseQty()"
+                        [disabled]="quantity <= 1">−</button>
+                <span>{{ quantity }}</span>
+                <button (click)="increaseQty()"
+                        [disabled]="quantity >= product.stockCount">+</button>
+              </div>
+            </div>
+
+            <div class="action-row">
+              @if (addedToCart) {
+                <button class="btn-goto-cart" (click)="goToCart()">
+                  🛒 Go to Cart
+                </button>
+              } @else {
+                <button
+                  class="btn-add"
+                  [disabled]="isAddingToCart"
+                  (click)="addToCart()">
+                  @if (isAddingToCart) {
+                    <span class="btn-spinner"></span> Adding...
+                  } @else {
+                    🛒 Add to Cart — ₹{{ product.price * quantity }}
+                  }
+                </button>
+              }
+            </div>
+          } @else {
+            <button class="btn-disabled" disabled>
+              Out of Stock
+            </button>
+          }
+
+        </div>
+      </div>
+
+      <!-- Related Products -->
+      @if (relatedProducts.length > 0) {
+        <div class="related-section">
+          <h2>You might also like</h2>
+          <div class="related-grid">
+            @for (p of relatedProducts; track p.id) {
+              <div class="related-card" (click)="viewRelated(p.id)">
+                <img
+                  [src]="p.imageUrl"
+                  [alt]="p.name"
+                  onerror="this.src='https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=300'"
+                />
+                <div class="related-info">
+                  <h4>{{ p.name }}</h4>
+                  <span>₹{{ p.price }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+    }
+  </div>
+</div>

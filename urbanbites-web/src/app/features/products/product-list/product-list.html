@@ -1,0 +1,141 @@
+<div class="page-wrapper">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="container">
+      <h1>Our Menu</h1>
+      <p>Discover amazing food from your favourite brands</p>
+    </div>
+  </div>
+
+  <div class="container page-body">
+
+    <!-- Filters Bar -->
+    <div class="filters-bar">
+
+      <!-- Search -->
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          (input)="onSearch()"
+          placeholder="Search for food, brands..."
+        />
+        @if (searchQuery) {
+          <button class="clear-search" (click)="searchQuery=''; applyFilters()">
+            ✕
+          </button>
+        }
+      </div>
+
+      <!-- Brand Filter -->
+      <select [(ngModel)]="selectedBrandId" (change)="onBrandChange()">
+        <option value="">All Brands</option>
+        @for (brand of brands; track brand.id) {
+          <option [value]="brand.id">{{ brand.name }}</option>
+        }
+      </select>
+
+      <!-- Category Filter -->
+      <select [(ngModel)]="selectedCategory" (change)="onCategoryChange()">
+        <option value="">All Categories</option>
+        @for (cat of categories; track cat.id) {
+          <option [value]="cat.id">{{ cat.name }}</option>
+        }
+      </select>
+
+      <!-- Sort -->
+      <select [(ngModel)]="sortBy" (change)="onSortChange()">
+        <option value="default">Sort by</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+        <option value="name">Name A–Z</option>
+      </select>
+
+      <!-- Clear Filters -->
+      @if (hasActiveFilters) {
+        <button class="clear-btn" (click)="clearFilters()">
+          Clear All
+        </button>
+      }
+
+    </div>
+
+    <!-- Results Count -->
+    <div class="results-meta">
+      @if (!isLoading) {
+        <span>{{ products.length }} item{{ products.length !== 1 ? 's' : '' }} found</span>
+      }
+    </div>
+
+    <!-- Products Grid -->
+    @if (isLoading) {
+      <div class="products-grid">
+        @for (item of [1,2,3,4,5,6,7,8,9,10,11,12]; track item) {
+          <div class="product-skeleton"></div>
+        }
+      </div>
+    } @else if (products.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">🍽️</div>
+        <h3>No items found</h3>
+        <p>Try adjusting your filters or search query</p>
+        <button class="btn-primary" (click)="clearFilters()">
+          Clear Filters
+        </button>
+      </div>
+    } @else {
+      <div class="products-grid">
+        @for (product of products; track product.id) {
+          <div class="product-card" (click)="viewProduct(product.id)">
+
+            <div class="product-img-wrap">
+              <img
+                [src]="product.imageUrl"
+                [alt]="product.name"
+                onerror="this.src='https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400'"
+              />
+              @if (product.stockCount === 0) {
+                <div class="out-badge">Out of Stock</div>
+              }
+              @if (product.stockCount > 0 && product.stockCount <= 5) {
+                <div class="low-badge">Only {{ product.stockCount }} left!</div>
+              }
+            </div>
+
+            <div class="product-info">
+              <div class="product-tags">
+                <span class="tag-brand">{{ product.brandName }}</span>
+                <span class="tag-cat">{{ product.categoryName }}</span>
+              </div>
+              <h3>{{ product.name }}</h3>
+              <p class="product-desc">{{ product.description }}</p>
+              <div class="product-packaging">
+                📦 {{ product.packaging }}
+              </div>
+              <div class="product-footer">
+                <span class="product-price">₹{{ product.price }}</span>
+                <button
+                  class="add-btn"
+                  [class.added]="addedToCart[product.id]"
+                  [disabled]="product.stockCount === 0 || addingToCart[product.id]"
+                  (click)="addToCart(product, $event)">
+                  @if (addingToCart[product.id]) {
+                    <span class="mini-spinner"></span>
+                  } @else if (addedToCart[product.id]) {
+                    ✓ Added
+                  } @else {
+                    + Add to Cart
+                  }
+                </button>
+              </div>
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</div>

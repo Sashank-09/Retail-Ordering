@@ -1,0 +1,217 @@
+<div class="checkout-page">
+  <div class="container">
+
+    <div class="page-header">
+      <a routerLink="/cart" class="back-link">← Back to Cart</a>
+      <h1>Checkout</h1>
+    </div>
+
+    @if (isLoading) {
+      <div class="loading-container">
+        <div class="spinner"></div>
+      </div>
+    } @else {
+      <div class="checkout-layout">
+
+        <!-- Left — Delivery + Offers -->
+        <div class="checkout-left">
+
+          <!-- Delivery Address -->
+          <div class="section-card">
+            <h2>📍 Delivery Address</h2>
+            <form [formGroup]="checkoutForm">
+              <div class="form-group">
+                <label>Full delivery address</label>
+                <textarea
+                  formControlName="deliveryAddress"
+                  rows="3"
+                  placeholder="House no, Street, Area, City, PIN code"
+                  [class.error]="deliveryAddress.invalid && deliveryAddress.touched">
+                </textarea>
+                @if (deliveryAddress.invalid && deliveryAddress.touched) {
+                  <span class="error-msg">
+                    Please enter a complete delivery address (min 10 characters).
+                  </span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label>Special requests <span class="optional">(optional)</span></label>
+                <textarea
+                  formControlName="specialRequests"
+                  rows="2"
+                  placeholder="e.g. Extra spicy, no onions, ring the bell...">
+                </textarea>
+              </div>
+            </form>
+          </div>
+
+          <!-- Coupon -->
+          <div class="section-card">
+            <h2>🎟️ Apply Coupon</h2>
+
+            @if (couponResult) {
+              <div class="coupon-applied">
+                <div class="coupon-success">
+                  <span>✅ Coupon <strong>{{ couponResult.code }}</strong> applied!</span>
+                  <span class="coupon-saving">
+                    You save ₹{{ couponResult.discountAmount }}
+                  </span>
+                </div>
+                <button class="remove-coupon" (click)="removeCoupon()">
+                  Remove
+                </button>
+              </div>
+            } @else {
+              <div class="coupon-input-row">
+                <input
+                  type="text"
+                  [(ngModel)]="couponCode"
+                  placeholder="Enter coupon code"
+                  [ngModelOptions]="{ standalone: true }"
+                  (keyup.enter)="applyCoupon()"
+                  [class.error]="couponError"
+                />
+                <button
+                  class="btn-apply"
+                  [disabled]="isApplyingCoupon || !couponCode.trim()"
+                  (click)="applyCoupon()">
+                  @if (isApplyingCoupon) {
+                    <span class="mini-spinner"></span>
+                  } @else {
+                    Apply
+                  }
+                </button>
+              </div>
+              @if (couponError) {
+                <span class="error-msg">{{ couponError }}</span>
+              }
+              <div class="available-codes">
+                <span>Available codes:</span>
+                <button (click)="couponCode='WELCOME20'">WELCOME20</button>
+                <button (click)="couponCode='URBAN10'">URBAN10</button>
+                <button (click)="couponCode='BITES15'">BITES15</button>
+              </div>
+            }
+          </div>
+
+          <!-- Loyalty Points -->
+          @if (loyaltyBalance && loyaltyBalance.totalPoints > 0) {
+            <div class="section-card">
+              <h2>⭐ Loyalty Points</h2>
+              <div class="loyalty-row">
+                <div class="loyalty-info">
+                  <span class="points-value">
+                    {{ loyaltyBalance.totalPoints }} points
+                  </span>
+                  <span class="points-worth">
+                    Worth ₹{{ loyaltyBalance.equivalentAmount }}
+                  </span>
+                </div>
+                <label class="toggle-switch">
+                  <input
+                    type="checkbox"
+                    [checked]="useLoyalty"
+                    (change)="toggleLoyalty()"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              @if (useLoyalty) {
+                <p class="loyalty-msg">
+                  ✅ ₹{{ loyaltyDiscount }} will be deducted from your total.
+                </p>
+              }
+            </div>
+          }
+
+        </div>
+
+        <!-- Right — Order Summary -->
+        <div class="checkout-right">
+          <div class="summary-card">
+            <h2>Order Summary</h2>
+
+            <!-- Items -->
+            <div class="summary-items">
+              @for (item of cart!.items; track item.cartItemId) {
+                <div class="summary-item">
+                  <img
+                    [src]="item.imageUrl"
+                    [alt]="item.productName"
+                    onerror="this.src='https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=100'"
+                  />
+                  <div class="summary-item-info">
+                    <span class="summary-item-name">
+                      {{ item.productName }}
+                    </span>
+                    <span class="summary-item-qty">
+                      × {{ item.quantity }}
+                    </span>
+                  </div>
+                  <span class="summary-item-price">
+                    ₹{{ item.subTotal }}
+                  </span>
+                </div>
+              }
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <!-- Price Breakdown -->
+            <div class="price-rows">
+              <div class="price-row">
+                <span>Subtotal</span>
+                <span>₹{{ cartSubtotal }}</span>
+              </div>
+              <div class="price-row">
+                <span>Delivery</span>
+                <span class="free">FREE</span>
+              </div>
+              @if (couponResult) {
+                <div class="price-row discount">
+                  <span>Coupon ({{ couponResult.code }})</span>
+                  <span>− ₹{{ couponResult.discountAmount }}</span>
+                </div>
+              }
+              @if (useLoyalty && loyaltyBalance) {
+                <div class="price-row discount">
+                  <span>Loyalty Points</span>
+                  <span>− ₹{{ loyaltyDiscount }}</span>
+                </div>
+              }
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="total-row">
+              <span>Total</span>
+              <span>₹{{ finalTotal }}</span>
+            </div>
+
+            @if (orderError) {
+              <div class="order-error">⚠️ {{ orderError }}</div>
+            }
+
+            <button
+              class="btn-place-order"
+              [disabled]="isPlacingOrder || checkoutForm.invalid"
+              (click)="placeOrder()">
+              @if (isPlacingOrder) {
+                <span class="btn-spinner"></span> Placing Order...
+              } @else {
+                🛒 Place Order — ₹{{ finalTotal }}
+              }
+            </button>
+
+            <p class="secure-note">
+              🔒 Secure & encrypted checkout
+            </p>
+          </div>
+        </div>
+
+      </div>
+    }
+
+  </div>
+</div>

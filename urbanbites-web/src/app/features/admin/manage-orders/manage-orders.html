@@ -1,0 +1,113 @@
+<div class="admin-page">
+  <div class="admin-header">
+    <div>
+      <h1 class="admin-title">📋 Manage Orders</h1>
+      <p class="admin-subtitle">View and update the status of all customer orders.</p>
+    </div>
+    <button class="btn btn-outline" (click)="loadOrders()">↺ Refresh</button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <input
+      class="search-input"
+      type="text"
+      placeholder="🔍 Search by order ID or address…"
+      [(ngModel)]="searchTerm"
+      (input)="onSearchChange()"
+    />
+    <select class="filter-select" [(ngModel)]="selectedStatus" (change)="onStatusFilterChange()">
+      <option value="">All Statuses</option>
+      @for (s of orderStatuses; track s) {
+        <option [value]="s">{{ s }}</option>
+      }
+    </select>
+  </div>
+
+  @if (updateError) {
+    <div class="alert alert-danger">{{ updateError }}</div>
+  }
+
+  @if (isLoading) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading orders…</p>
+    </div>
+  } @else if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  } @else if (filteredOrders.length === 0) {
+    <div class="admin-card">
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <p>No orders match your filters.</p>
+      </div>
+    </div>
+  } @else {
+    <div class="admin-card">
+      <div class="card-header">
+        <h2 class="card-title">Orders <span class="count-badge">{{ filteredOrders.length }}</span></h2>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Items</th>
+              <th>Amount</th>
+              <th>Discount</th>
+              <th>Placed At</th>
+              <th>Status</th>
+              <th>Update Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (order of filteredOrders; track order.id) {
+              <tr>
+                <td class="mono">#{{ order.id.slice(0, 8).toUpperCase() }}</td>
+                <td>
+                  <div class="item-pills">
+                    @for (item of order.items.slice(0, 2); track item.productId) {
+                      <span class="item-pill">{{ item.productName }} ×{{ item.quantity }}</span>
+                    }
+                    @if (order.items.length > 2) {
+                      <span class="item-pill more">+{{ order.items.length - 2 }}</span>
+                    }
+                  </div>
+                </td>
+                <td class="fw-600">₹{{ order.totalAmount }}</td>
+                <td>
+                  @if (order.discountAmount > 0) {
+                    <span class="discount-text">-₹{{ order.discountAmount }}</span>
+                  } @else {
+                    <span class="text-muted">—</span>
+                  }
+                </td>
+                <td class="text-muted">{{ order.placedAt | date:'dd MMM, h:mm a' }}</td>
+                <td>
+                  <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+                    {{ getStatusLabel(order.status) }}
+                  </span>
+                </td>
+                <td>
+                  <select
+                    class="status-select"
+                    [value]="order.status"
+                    [disabled]="updatingOrderId === order.id || order.status === 'Cancelled' || order.status === 'Delivered'"
+                    (change)="updateOrderStatus(order.id, $any($event.target).value)"
+                  >
+                    @for (s of orderStatuses; track s) {
+                      <option [value]="s">{{ s }}</option>
+                    }
+                  </select>
+                  @if (updatingOrderId === order.id) {
+                    <span class="updating-text">Saving…</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>

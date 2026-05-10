@@ -1,0 +1,120 @@
+<div class="admin-page">
+  <div class="admin-header">
+    <div>
+      <h1 class="admin-title">🎟️ Manage Coupons</h1>
+      <p class="admin-subtitle">Create and manage discount coupons for customers.</p>
+    </div>
+    <button class="btn btn-primary" (click)="openForm()">＋ Add Coupon</button>
+  </div>
+
+  @if (deleteError) {
+    <div class="alert alert-danger">{{ deleteError }}</div>
+  }
+
+  @if (isLoading) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading coupons…</p>
+    </div>
+  } @else if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  } @else {
+
+    @if (coupons.length === 0) {
+      <div class="empty-card">
+        <div class="empty-icon">🎟️</div>
+        <p>No coupons yet. Create one to get started.</p>
+        <button class="btn btn-primary" (click)="openForm()">＋ Add Coupon</button>
+      </div>
+    } @else {
+      <div class="coupon-grid">
+        @for (coupon of coupons; track coupon.id) {
+          <div class="coupon-card" [class.expired]="isExpired(coupon.expiryDate)">
+            <div class="coupon-stripe"></div>
+            <div class="coupon-body">
+              <div class="coupon-top">
+                <span class="coupon-code">{{ coupon.code }}</span>
+                @if (isExpired(coupon.expiryDate)) {
+                  <span class="expired-badge">Expired</span>
+                } @else {
+                  <span class="active-badge">Active</span>
+                }
+              </div>
+              <p class="coupon-desc">{{ coupon.description }}</p>
+              <div class="coupon-meta">
+                <div class="meta-item">
+                  <span class="meta-label">Discount</span>
+                  <span class="meta-value discount">{{ coupon.discountPercent }}% OFF</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Min Order</span>
+                  <span class="meta-value">₹{{ coupon.minOrderAmount }}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Expires</span>
+                  <span class="meta-value">{{ coupon.expiryDate | date:'dd MMM yyyy' }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="coupon-footer">
+              <button
+                class="btn btn-sm btn-danger"
+                [disabled]="deletingId === coupon.id"
+                (click)="deleteCoupon(coupon.id)"
+              >
+                {{ deletingId === coupon.id ? 'Deleting…' : '🗑️ Delete' }}
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
+
+<!-- Add Coupon Modal -->
+@if (showForm) {
+  <div class="modal-backdrop" (click)="closeForm()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>🎟️ New Coupon</h2>
+        <button class="modal-close" (click)="closeForm()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        @if (saveError) {
+          <div class="alert alert-danger">{{ saveError }}</div>
+        }
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Coupon Code</label>
+            <input type="text" [(ngModel)]="form.code" placeholder="e.g. SAVE20" style="text-transform:uppercase" />
+          </div>
+          <div class="form-group">
+            <label>Discount (%)</label>
+            <input type="number" [(ngModel)]="form.discountPercent" min="1" max="100" />
+          </div>
+          <div class="form-group full">
+            <label>Description</label>
+            <input type="text" [(ngModel)]="form.description" placeholder="Short description of this coupon" />
+          </div>
+          <div class="form-group">
+            <label>Min Order Amount (₹)</label>
+            <input type="number" [(ngModel)]="form.minOrderAmount" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Expiry Date</label>
+            <input type="date" [(ngModel)]="form.expiryDate" />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" (click)="closeForm()">Cancel</button>
+        <button class="btn btn-primary" [disabled]="isSaving" (click)="saveCoupon()">
+          {{ isSaving ? 'Creating…' : '＋ Create Coupon' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

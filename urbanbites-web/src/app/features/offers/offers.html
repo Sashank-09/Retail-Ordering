@@ -1,0 +1,96 @@
+<div class="offers-page">
+  <div class="container">
+
+    <div class="page-header">
+      <h1>🎉 Offers & Promotions</h1>
+      <p class="page-subtitle">Exclusive deals just for you</p>
+    </div>
+
+    @if (isLoading) {
+      <div class="loading-container">
+        <div class="spinner"></div>
+      </div>
+    } @else {
+
+      <!-- Promotions Section -->
+      <section class="section">
+        <h2 class="section-title">🔥 Active Promotions</h2>
+        @if (promotions.length === 0) {
+          <div class="empty-section">No active promotions right now. Check back soon!</div>
+        } @else {
+          <div class="promotions-grid">
+            @for (promo of promotions; track promo.id) {
+              <div class="promo-card">
+                <div class="promo-image">
+                  <img [src]="promo.imageUrl" [alt]="promo.title"
+                       onerror="this.src='https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800'" />
+                  <span class="discount-tag">{{ promo.discountPercent }}% OFF</span>
+                </div>
+                <div class="promo-body">
+                  <h3>{{ promo.title }}</h3>
+                  <p>{{ promo.description }}</p>
+                  <div class="promo-dates">
+                    <span>📅 Valid till {{ promo.endDate | date: 'dd MMM yyyy' }}</span>
+                  </div>
+                  <a routerLink="/products" class="btn-shop">Shop Now →</a>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- Coupons Section -->
+      <section class="section">
+        <h2 class="section-title">🎟️ Available Coupons</h2>
+        @if (loyaltyBalance !== null) {
+          <div class="loyalty-banner">
+            <div class="loyalty-info">
+              <span class="loyalty-icon">⭐</span>
+              <div>
+                <strong>{{ loyaltyBalance.totalPoints }} Loyalty Points</strong>
+                <span>Worth ₹{{ loyaltyBalance.equivalentAmount }} — redeem at checkout!</span>
+              </div>
+            </div>
+            <a routerLink="/products" class="btn-earn">Earn More</a>
+          </div>
+        }
+
+        @if (coupons.length === 0) {
+          <div class="empty-section">No coupons available right now.</div>
+        } @else {
+          <div class="coupons-grid">
+            @for (coupon of coupons; track coupon.id) {
+              <div class="coupon-card">
+                <div class="coupon-left">
+                  <span class="coupon-percent">{{ coupon.discountPercent }}%</span>
+                  <span class="coupon-off">OFF</span>
+                </div>
+                <div class="coupon-divider">
+                  <div class="notch top"></div>
+                  <div class="dash-line"></div>
+                  <div class="notch bottom"></div>
+                </div>
+                <div class="coupon-right">
+                  <div class="coupon-code">{{ coupon.code }}</div>
+                  <div class="coupon-desc">{{ coupon.description }}</div>
+                  <div class="coupon-meta">
+                    @if (coupon.minOrderAmount > 0) {
+                      <span>Min order ₹{{ coupon.minOrderAmount }}</span>
+                    }
+                    <span>Expires {{ coupon.expiryDate | date: 'dd MMM yyyy' }}</span>
+                  </div>
+                  <button class="btn-copy" (click)="copyCoupon(coupon.code)">
+                    {{ copiedCode === coupon.code ? '✅ Copied!' : '📋 Copy Code' }}
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+    }
+
+  </div>
+</div>

@@ -1,0 +1,320 @@
+.offers-page {
+  background: #f8f8f8;
+  min-height: 100vh;
+  padding: 40px 0 60px;
+}
+
+.page-header {
+  margin-bottom: 36px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+}
+
+.page-subtitle {
+  font-size: 15px;
+  color: #888;
+}
+
+/* ── Loading ─────────────────────────────────────── */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid #f0f0f0;
+  border-top-color: #FF6B35;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Section ─────────────────────────────────────── */
+.section { margin-bottom: 48px; }
+
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 20px;
+}
+
+.empty-section {
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+}
+
+/* ── Promotions Grid ─────────────────────────────── */
+.promotions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.promo-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.promo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+}
+
+.promo-image {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+}
+
+.promo-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.promo-card:hover .promo-image img { transform: scale(1.05); }
+
+.discount-tag {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #FF6B35;
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 20px;
+}
+
+.promo-body {
+  padding: 20px;
+}
+
+.promo-body h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+}
+
+.promo-body p {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.promo-dates {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 16px;
+}
+
+.btn-shop {
+  display: inline-block;
+  background: #FF6B35;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.btn-shop:hover { background: #e55a26; }
+
+/* ── Loyalty Banner ──────────────────────────────── */
+.loyalty-banner {
+  background: linear-gradient(135deg, #fff8e1, #fff3cd);
+  border: 1.5px solid #ffd54f;
+  border-radius: 16px;
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.loyalty-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.loyalty-icon { font-size: 32px; }
+
+.loyalty-info strong {
+  display: block;
+  font-size: 16px;
+  color: #1a1a1a;
+  margin-bottom: 2px;
+}
+
+.loyalty-info span {
+  font-size: 13px;
+  color: #888;
+}
+
+.btn-earn {
+  background: #f59e0b;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.btn-earn:hover { background: #d97706; }
+
+/* ── Coupons Grid ────────────────────────────────── */
+.coupons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+.coupon-card {
+  background: white;
+  border-radius: 16px;
+  display: flex;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  border: 1.5px dashed #e0e0e0;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.coupon-card:hover {
+  border-color: #FF6B35;
+  box-shadow: 0 4px 16px rgba(255,107,53,0.12);
+}
+
+.coupon-left {
+  background: #FF6B35;
+  color: white;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+}
+
+.coupon-percent {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.coupon-off {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.coupon-divider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: 16px;
+  background: #f8f8f8;
+}
+
+.notch {
+  width: 16px;
+  height: 16px;
+  background: #f8f8f8;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.notch.top { margin-top: -8px; }
+.notch.bottom { margin-bottom: -8px; }
+
+.dash-line {
+  flex: 1;
+  border-left: 2px dashed #e0e0e0;
+}
+
+.coupon-right {
+  flex: 1;
+  padding: 16px 20px;
+}
+
+.coupon-code {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1a1a1a;
+  font-family: monospace;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+.coupon-desc {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.coupon-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.coupon-meta span {
+  font-size: 11px;
+  color: #999;
+  background: #f5f5f5;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+.btn-copy {
+  background: none;
+  border: 1.5px solid #FF6B35;
+  color: #FF6B35;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.btn-copy:hover {
+  background: #FF6B35;
+  color: white;
+}
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 768px) {
+  .promotions-grid { grid-template-columns: 1fr; }
+  .coupons-grid { grid-template-columns: 1fr; }
+  .loyalty-banner { flex-direction: column; gap: 14px; align-items: flex-start; }
+}

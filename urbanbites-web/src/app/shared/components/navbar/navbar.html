@@ -1,0 +1,63 @@
+<nav class="navbar">
+  <div class="container nav-inner">
+
+    <a routerLink="/" class="nav-logo">🍕 UrbanBites</a>
+
+    <ul class="nav-links">
+      <li>
+        <a routerLink="/" routerLinkActive="active"
+           [routerLinkActiveOptions]="{ exact: true }">Home</a>
+      </li>
+      <li>
+        <a routerLink="/products" routerLinkActive="active">Products</a>
+      </li>
+      @if (isLoggedIn()) {
+        <li>
+          <a routerLink="/my-bookings" routerLinkActive="active">
+            My Bookings
+          </a>
+        </li>
+        <li>
+          <a routerLink="/offers" routerLinkActive="active">Offers</a>
+        </li>
+      }
+    </ul>
+
+    <div class="nav-right">
+      <!-- Cart icon visible for EVERYONE (guests & authenticated) -->
+      <a routerLink="/cart" class="cart-btn">
+        <span>🛒</span>
+        @if (isLoggedIn()) {
+          @if (cartCount() > 0) {
+            <span class="cart-badge">{{ cartCount() }}</span>
+          }
+        } @else {
+          @if (guestCartCount() > 0) {
+            <span class="cart-badge">{{ guestCartCount() }}</span>
+          }
+        }
+      </a>
+
+      @if (isLoggedIn()) {
+        <div class="profile-menu">
+          <button class="profile-btn" (click)="toggleMenu()">
+            {{ initials() }}
+          </button>
+          @if (menuOpen) {
+            <div class="dropdown">
+              <a routerLink="/profile" (click)="closeMenu()">My Profile</a>
+              @if (isAdmin() || isOwner()) {
+                <a routerLink="/admin" (click)="closeMenu()">Admin Panel</a>
+              }
+              <button (click)="logout()">Logout</button>
+            </div>
+          }
+        </div>
+      } @else {
+        <a routerLink="/auth/login" class="btn btn-outline btn-sm">Login</a>
+        <a routerLink="/auth/register" class="btn btn-primary btn-sm">Sign Up</a>
+      }
+    </div>
+
+  </div>
+</nav>

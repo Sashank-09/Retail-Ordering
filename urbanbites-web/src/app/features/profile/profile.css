@@ -1,0 +1,351 @@
+.profile-page {
+  background: #f8f8f8;
+  min-height: 100vh;
+  padding: 40px 0 60px;
+}
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* ── Loading ─────────────────────────────────────── */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid #f0f0f0;
+  border-top-color: #FF6B35;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Layout ──────────────────────────────────────── */
+.profile-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ── Sidebar ─────────────────────────────────────── */
+.avatar-card {
+  background: white;
+  border-radius: 20px;
+  padding: 32px 24px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  position: sticky;
+  top: 84px;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #FF6B35;
+  color: white;
+  font-size: 28px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.avatar-card h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+}
+
+.role-badge {
+  display: inline-block;
+  background: #fff0eb;
+  color: #FF6B35;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 12px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+
+.quick-stats {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 20px;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.stat {
+  flex: 1;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #999;
+}
+
+.stat-divider {
+  width: 1px;
+  background: #f0f0f0;
+  margin: 8px 0;
+}
+
+.btn-view-orders {
+  display: block;
+  background: #FF6B35;
+  color: white;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.btn-view-orders:hover { background: #e55a26; }
+
+/* ── Main Cards ──────────────────────────────────── */
+.profile-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin-bottom: 20px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.card-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.btn-edit {
+  background: none;
+  border: 1.5px solid #e0e0e0;
+  color: #555;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.btn-edit:hover { border-color: #FF6B35; color: #FF6B35; }
+
+/* ── Info Grid ───────────────────────────────────── */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-label {
+  font-size: 12px;
+  color: #999;
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 15px;
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+/* ── Edit Form ───────────────────────────────────── */
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 13px;
+  color: #555;
+  font-weight: 500;
+}
+
+.form-group input {
+  padding: 10px 14px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #1a1a1a;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus { border-color: #FF6B35; }
+.form-group input.disabled { background: #f8f8f8; color: #aaa; cursor: not-allowed; }
+
+.field-note {
+  font-size: 11px;
+  color: #bbb;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.btn-cancel {
+  flex: 1;
+  padding: 12px;
+  background: none;
+  border: 1.5px solid #e0e0e0;
+  color: #666;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.btn-cancel:hover { border-color: #ccc; background: #f8f8f8; }
+
+.btn-save {
+  flex: 2;
+  padding: 12px;
+  background: #FF6B35;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.btn-save:hover:not(:disabled) { background: #e55a26; }
+.btn-save:disabled { opacity: 0.7; cursor: not-allowed; }
+
+.success-msg {
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+.error-msg {
+  background: #ffebee;
+  color: #c62828;
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+/* ── Loyalty Card ────────────────────────────────── */
+.loyalty-summary {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.loyalty-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff8e1;
+  border-radius: 12px;
+  padding: 16px 24px;
+  min-width: 120px;
+}
+
+.points-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: #f59e0b;
+}
+
+.points-label {
+  font-size: 12px;
+  color: #888;
+}
+
+.points-worth {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f59e0b;
+  margin-top: 4px;
+}
+
+.loyalty-tip {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.6;
+  flex: 1;
+}
+
+.btn-view-offers {
+  display: inline-block;
+  color: #FF6B35;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.btn-view-offers:hover { opacity: 0.8; }
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 768px) {
+  .profile-layout { grid-template-columns: 1fr; }
+  .avatar-card { position: static; }
+  .info-grid { grid-template-columns: 1fr; }
+  .loyalty-summary { flex-direction: column; align-items: flex-start; }
+}

@@ -1,0 +1,106 @@
+<div class="admin-page">
+  <div class="admin-header">
+    <div>
+      <h1 class="admin-title">📊 Dashboard</h1>
+      <p class="admin-subtitle">Welcome back — here's what's happening today.</p>
+    </div>
+    <button class="btn btn-outline" (click)="loadStats()">↺ Refresh</button>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading dashboard…</p>
+    </div>
+  } @else if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  } @else if (stats) {
+
+    <div class="stat-grid">
+      <div class="stat-card orange">
+        <div class="stat-icon">🛒</div>
+        <div class="stat-body">
+          <span class="stat-value">{{ stats.totalOrders }}</span>
+          <span class="stat-label">Total Orders</span>
+        </div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon">₹</div>
+        <div class="stat-body">
+          <span class="stat-value">₹{{ stats.totalRevenue | number:'1.0-0' }}</span>
+          <span class="stat-label">Total Revenue</span>
+        </div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-icon">📦</div>
+        <div class="stat-body">
+          <span class="stat-value">{{ stats.totalProducts }}</span>
+          <span class="stat-label">Products</span>
+        </div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-icon">👥</div>
+        <div class="stat-body">
+          <span class="stat-value">{{ stats.totalCustomers }}</span>
+          <span class="stat-label">Customers</span>
+        </div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-body">
+          <span class="stat-value">{{ stats.pendingOrders }}</span>
+          <span class="stat-label">Pending Orders</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-links">
+  <a routerLink="/admin/orders"      class="quick-link">📋 Manage Orders</a>
+  <a routerLink="/admin/products"    class="quick-link">🍔 Manage Products</a>
+  <a routerLink="/admin/coupons"     class="quick-link">🎟️ Manage Coupons</a>
+  <a routerLink="/admin/promotions"  class="quick-link">📣 Manage Promotions</a>
+  <a routerLink="/admin/users"       class="quick-link">👤 Manage Users</a>
+</div>
+
+    <div class="admin-card">
+      <div class="card-header">
+        <h2 class="card-title">Recent Orders</h2>
+        <a routerLink="/admin/orders" class="btn btn-sm btn-outline">View All →</a>
+      </div>
+
+      @if (stats.recentOrders.length === 0) {
+        <div class="empty-state">No recent orders found.</div>
+      } @else {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Items</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Placed At</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of stats.recentOrders; track order.id) {
+                <tr>
+                  <td class="mono">#{{ order.id.slice(0, 8).toUpperCase() }}</td>
+                  <td>{{ order.itemCount }} item{{ order.itemCount !== 1 ? 's' : '' }}</td>
+                  <td class="fw-600">₹{{ order.totalAmount }}</td>
+                  <td>
+                    <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+                      {{ getStatusLabel(order.status) }}
+                    </span>
+                  </td>
+                  <td class="text-muted">{{ order.placedAt | date:'dd MMM, h:mm a' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+  }
+</div>
