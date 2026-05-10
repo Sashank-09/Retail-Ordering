@@ -14,6 +14,7 @@ namespace UrbanBites.Application.Interfaces.Services
 
         Task SendOtpEmailAsync(string toEmail, string otpCode);
         Task SendWelcomeEmailAsync(string toEmail, string customerName);
+        Task SendOrderStatusUpdateEmailAsync(string toEmail, string customerName, string orderId, string newStatus);
     }
 
     public class OrderEmailItem

@@ -18,6 +18,7 @@ namespace UrbanBites.Application.Services
         private readonly ICouponService _couponService;
         private readonly ILoyaltyService _loyaltyService;
         private readonly ICouponRepository _couponRepository;
+        private readonly IUserRepository _userRepository;
 
         public OrderService(
             IOrderRepository orderRepository,
@@ -26,7 +27,8 @@ namespace UrbanBites.Application.Services
             IEmailService emailService,
             ICouponService couponService,
             ILoyaltyService loyaltyService,
-            ICouponRepository couponRepository)
+            ICouponRepository couponRepository,
+            IUserRepository userRepository)
         {
             _orderRepository = orderRepository;
             _cartRepository = cartRepository;
@@ -35,6 +37,7 @@ namespace UrbanBites.Application.Services
             _couponService = couponService;
             _loyaltyService = loyaltyService;
             _couponRepository = couponRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<OrderDto> PlaceOrderAsync(
@@ -226,7 +229,35 @@ namespace UrbanBites.Application.Services
 
             order.Status = parsed;
             _orderRepository.Update(order);
-            return await _orderRepository.SaveChangesAsync();
+            var saved = await _orderRepository.SaveChangesAsync();
+
+            if (saved)
+            {
+                // Fire-and-forget email notification to customer
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        var email = await _userRepository.GetUserEmailAsync(order.UserId);
+                        var name = await _userRepository.GetUserNameAsync(order.UserId);
+                        if (!string.IsNullOrEmpty(email))
+                        {
+                            await _emailService.SendOrderStatusUpdateEmailAsync(
+                                email,
+                                name ?? "Valued Customer",
+                                order.Id.ToString(),
+                                parsed.ToString()
+                            );
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[EMAIL-UPDATE] ❌ Failed background email task: {ex.Message}");
+                    }
+                });
+            }
+
+            return saved;
         }
     }
 }

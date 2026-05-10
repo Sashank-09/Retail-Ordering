@@ -30,6 +30,7 @@ namespace UrbanBites.Infrastructure
             services.AddScoped<IPromotionRepository, PromotionRepository>();
             services.AddScoped<ILoyaltyRepository, LoyaltyRepository>();
             services.AddScoped<IOtpRepository, OtpRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             // ── Services ──────────────────────────────────
             services.AddScoped<IAuthService, AuthService>();

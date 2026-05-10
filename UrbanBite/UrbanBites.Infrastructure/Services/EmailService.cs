@@ -176,6 +176,63 @@ namespace UrbanBites.Infrastructure.Services
             }
         }
 
+        public async Task SendOrderStatusUpdateEmailAsync(string toEmail, string customerName, string orderId, string newStatus)
+        {
+            try
+            {
+                var apiKey = _configuration["EmailSettings:SendGridApiKey"]!;
+                var senderEmail = _configuration["EmailSettings:SenderEmail"]!;
+                var senderName = _configuration["EmailSettings:SenderName"]!;
+
+                // Pretty names for status updates
+                string statusDesc = newStatus switch
+                {
+                    "Confirmed" => "is now confirmed and being reviewed by the kitchen.",
+                    "Preparing" => "is being freshly prepared by our chefs!",
+                    "OutForDelivery" => "is out for delivery and will arrive shortly 🛵",
+                    "Delivered" => "has been successfully delivered. Enjoy your meal!",
+                    "Cancelled" => "has been cancelled.",
+                    _ => $"status has changed to {newStatus}."
+                };
+
+                var html = $"""
+                    <html>
+                    <body style="font-family:Arial,sans-serif;padding:40px;background:#f9fafb;">
+                      <div style="max-width:600px;margin:auto;background:white;border-radius:16px;padding:30px;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);">
+                        <div style="text-align:center;margin-bottom:20px;">
+                           <h1 style="color:#FF6B35;margin:0;">🍕 UrbanBites</h1>
+                        </div>
+                        <h2>Order Update</h2>
+                        <p>Hi <b>{customerName}</b>,</p>
+                        <p style="font-size:16px;line-height:1.5;">Your order <b>#{orderId[..8].ToUpper()}</b> {statusDesc}</p>
+                        <div style="margin-top:30px;text-align:center;border-top:1px solid #eee;padding-top:20px;">
+                           <a href="https://retail-ordering.vercel.app/my-bookings" style="background:#FF6B35;color:white;padding:12px 24px;text-decoration:none;border-radius:8px;font-weight:bold;display:inline-block;">View Order Progress</a>
+                        </div>
+                      </div>
+                    </body>
+                    </html>
+                """;
+
+                var client = new SendGridClient(apiKey);
+                var from = new EmailAddress(senderEmail, senderName);
+                var to = new EmailAddress(toEmail, customerName);
+                var subject = $"UrbanBites — Order Status Update: {newStatus}";
+                var msg = MailHelper.CreateSingleEmail(from, to, subject, $"Order #{orderId[..8].ToUpper()} {newStatus}", html);
+
+                var response = await client.SendEmailAsync(msg);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var body = await response.Body.ReadAsStringAsync();
+                    throw new Exception($"SendGrid Error: {response.StatusCode} - {body}");
+                }
+                Console.WriteLine($"[EMAIL] ✅ Order status email sent to {toEmail}");
+            }
+            catch (Exception ex)
+            {
+                await SaveToLocalFile("StatusUpdate", toEmail, ex.Message);
+            }
+        }
+
         private async Task SaveToLocalFile(string type, string to, string error)
         {
             try
