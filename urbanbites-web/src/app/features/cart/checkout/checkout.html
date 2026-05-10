@@ -197,15 +197,11 @@
               class="btn-place-order"
               [disabled]="isPlacingOrder || checkoutForm.invalid"
               (click)="placeOrder()">
-              @if (isPlacingOrder) {
-                <span class="btn-spinner"></span> Placing Order...
-              } @else {
-                🛒 Place Order — ₹{{ finalTotal }}
-              }
+              <span *ngIf="isPlacingOrder">Processing Payment...</span>
+              <span *ngIf="!isPlacingOrder">Place Order & Pay ₹{{ finalTotal | number:'1.2-2' }}</span>
             </button>
-
-            <p class="secure-note">
-              🔒 Secure & encrypted checkout
+            <p class="secure-text">
+              🔒 Secure & encrypted checkout via Razorpay
             </p>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { CartService } from '../../../core/services/cart.service';
 import { OrderService } from '../../../core/services/order.service';
 import { PromotionService } from '../../../core/services/promotion.service';
 import { LoyaltyService } from '../../../core/services/loyalty.service';
+import { PaymentService } from '../../../core/services/payment.service';
 import { Cart } from '../../../core/models/cart.models';
 import { ApplyCouponResponse } from '../../../core/models/promotion.models';
 import { LoyaltyBalance } from '../../../core/models/loyalty.models';
@@ -13,38 +14,42 @@ import { LoyaltyBalance } from '../../../core/models/loyalty.models';
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule,FormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, FormsModule],
   templateUrl: './checkout.html',
   styleUrl: './checkout.css'
 })
 export class CheckoutComponent implements OnInit {
 
-  private fb               = inject(FormBuilder);
-  private cartService      = inject(CartService);
-  private orderService     = inject(OrderService);
+  private fb = inject(FormBuilder);
+  private cartService = inject(CartService);
+  private orderService = inject(OrderService);
   private promotionService = inject(PromotionService);
-  private loyaltyService   = inject(LoyaltyService);
-  private router           = inject(Router);
+  private loyaltyService = inject(LoyaltyService);
+  private paymentService = inject(PaymentService);
+  private router = inject(Router);
 
-  cart:           Cart | null             = null;
-  couponResult:   ApplyCouponResponse | null = null;
-  loyaltyBalance: LoyaltyBalance | null   = null;
+  // You must set this to your Razorpay Test Key ID
+  private razorpayKeyId = 'rzp_test_SngL2RZRdt3WjF';
 
-  isLoading       = true;
-  isPlacingOrder  = false;
+  cart: Cart | null = null;
+  couponResult: ApplyCouponResponse | null = null;
+  loyaltyBalance: LoyaltyBalance | null = null;
+
+  isLoading = true;
+  isPlacingOrder = false;
   isApplyingCoupon = false;
-  couponError     = '';
-  orderError      = '';
+  couponError = '';
+  orderError = '';
 
-  couponCode      = '';
-  useLoyalty      = false;
+  couponCode = '';
+  useLoyalty = false;
 
   checkoutForm: FormGroup;
 
   constructor() {
     this.checkoutForm = this.fb.group({
-      deliveryAddress:  ['', [Validators.required, Validators.minLength(10)]],
-      specialRequests:  ['']
+      deliveryAddress: ['', [Validators.required, Validators.minLength(10)]],
+      specialRequests: ['']
     });
   }
 
@@ -57,7 +62,7 @@ export class CheckoutComponent implements OnInit {
     this.isLoading = true;
     this.cartService.loadCart().subscribe({
       next: (cart) => {
-        this.cart      = cart;
+        this.cart = cart;
         this.isLoading = false;
         if (!cart || cart.items.length === 0) {
           this.router.navigate(['/cart']);
@@ -73,26 +78,26 @@ export class CheckoutComponent implements OnInit {
   private loadLoyalty(): void {
     this.loyaltyService.getBalance().subscribe({
       next: (balance) => { this.loyaltyBalance = balance; },
-      error: () => {}
+      error: () => { }
     });
   }
 
   applyCoupon(): void {
     if (!this.couponCode.trim()) return;
     this.isApplyingCoupon = true;
-    this.couponError      = '';
+    this.couponError = '';
 
     this.promotionService.applyCoupon({
-      code:        this.couponCode.toUpperCase(),
+      code: this.couponCode.toUpperCase(),
       orderAmount: this.cartSubtotal
     }).subscribe({
       next: (result) => {
-        this.couponResult    = result;
+        this.couponResult = result;
         this.isApplyingCoupon = false;
       },
       error: (err) => {
-        this.couponError      = err.error?.message || 'Invalid coupon code.';
-        this.couponResult     = null;
+        this.couponError = err.error?.message || 'Invalid coupon code.';
+        this.couponResult = null;
         this.isApplyingCoupon = false;
       }
     });
@@ -100,8 +105,8 @@ export class CheckoutComponent implements OnInit {
 
   removeCoupon(): void {
     this.couponResult = null;
-    this.couponCode   = '';
-    this.couponError  = '';
+    this.couponCode = '';
+    this.couponError = '';
   }
 
   toggleLoyalty(): void {
@@ -115,21 +120,78 @@ export class CheckoutComponent implements OnInit {
     }
 
     this.isPlacingOrder = true;
-    this.orderError     = '';
+    this.orderError = '';
 
-    this.orderService.placeOrder({
-      deliveryAddress: this.checkoutForm.value.deliveryAddress,
-      specialRequests: this.checkoutForm.value.specialRequests || '',
-      couponCode:      this.couponResult ? this.couponCode : undefined,
-      useLoyaltyPoints: this.useLoyalty
-    }).subscribe({
-      next: (order) => {
-        this.cartService.clearLocalCart();
-        this.router.navigate(['/my-bookings', order.id]);
+    // Step 1: Create Razorpay Order
+    this.paymentService.createOrder(this.finalTotal).subscribe({
+      next: (res) => {
+        // Step 2: Open Razorpay Modal
+        const options = {
+          key: this.razorpayKeyId,
+          amount: this.finalTotal * 100, // Amount in paise
+          currency: 'INR',
+          name: 'UrbanBites',
+          description: 'Food Order Payment',
+          order_id: res.razorpayOrderId,
+          handler: (response: any) => {
+            // Step 3: Verify Signature on Backend
+            this.verifyAndCompleteOrder(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature);
+          },
+          prefill: {
+            name: 'Customer',
+            email: 'customer@example.com'
+          },
+          theme: {
+            color: '#f97316'
+          },
+          modal: {
+            ondismiss: () => {
+              this.isPlacingOrder = false;
+              this.orderError = 'Payment was cancelled.';
+            }
+          }
+        };
+
+        const rzp = new (window as any).Razorpay(options);
+        rzp.open();
       },
       error: (err) => {
         this.isPlacingOrder = false;
-        this.orderError     = err.error?.message || 'Failed to place order.';
+        this.orderError = err.error?.message || 'Failed to initialize payment.';
+      }
+    });
+  }
+
+  private verifyAndCompleteOrder(paymentId: string, orderId: string, signature: string): void {
+    this.paymentService.verifyPayment({
+      razorpayPaymentId: paymentId,
+      razorpayOrderId: orderId,
+      razorpaySignature: signature
+    }).subscribe({
+      next: (verifyRes) => {
+        if (verifyRes.success) {
+          // Step 4: Place the Order securely
+          this.orderService.placeOrder({
+            deliveryAddress: this.checkoutForm.value.deliveryAddress,
+            specialRequests: this.checkoutForm.value.specialRequests || '',
+            couponCode: this.couponResult ? this.couponCode : undefined,
+            useLoyaltyPoints: this.useLoyalty,
+            transactionId: verifyRes.transactionId
+          }).subscribe({
+            next: (order) => {
+              this.cartService.clearLocalCart();
+              this.router.navigate(['/my-bookings', order.id]);
+            },
+            error: (err) => {
+              this.isPlacingOrder = false;
+              this.orderError = err.error?.message || 'Failed to create order after payment.';
+            }
+          });
+        }
+      },
+      error: () => {
+        this.isPlacingOrder = false;
+        this.orderError = 'Payment verification failed.';
       }
     });
   }

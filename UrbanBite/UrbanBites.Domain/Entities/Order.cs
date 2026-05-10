@@ -1,4 +1,4 @@
-﻿using UrbanBites.Domain.Enums;
+using UrbanBites.Domain.Enums;
 
 namespace UrbanBites.Domain.Entities
 {
@@ -15,6 +15,8 @@ namespace UrbanBites.Domain.Entities
 
         // Foreign Key only — no navigation to AppUser in Domain
         public Guid UserId { get; set; }
+
+        public string? TransactionId { get; set; }
 
         // Navigation
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

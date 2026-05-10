@@ -1,4 +1,4 @@
-﻿namespace UrbanBites.Application.DTOs.Order
+namespace UrbanBites.Application.DTOs.Order
 {
     public class PlaceOrderDto
     {
@@ -6,5 +6,6 @@
         public string SpecialRequests { get; set; } = string.Empty;
         public string? CouponCode { get; set; }
         public bool UseLoyaltyPoints { get; set; } = false;
+        public string? TransactionId { get; set; }
     }
 }

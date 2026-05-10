@@ -25,6 +25,7 @@ export interface PlaceOrderRequest {
   specialRequests: string;
   couponCode?: string;
   useLoyaltyPoints: boolean;
+  transactionId?: string;
 }
 
 export interface UpdateOrderStatusRequest {

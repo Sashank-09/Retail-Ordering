@@ -1,4 +1,4 @@
-﻿using UrbanBites.Application.DTOs.Order;
+using UrbanBites.Application.DTOs.Order;
 using UrbanBites.Application.DTOs.Coupon;
 using UrbanBites.Application.DTOs.Loyalty;
 using UrbanBites.Application.Interfaces.Repositories;
@@ -137,6 +137,7 @@ namespace UrbanBites.Application.Services
                 CouponCode = appliedCoupon,
                 LoyaltyPointsUsed = loyaltyPointsUsed,
                 LoyaltyPointsEarned = (int)total,
+                TransactionId = dto.TransactionId,
                 PlacedAt = DateTime.UtcNow,
                 OrderItems = orderItems
             };
