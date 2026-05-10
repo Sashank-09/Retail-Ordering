@@ -230,31 +230,27 @@ namespace UrbanBites.Application.Services
             order.Status = parsed;
             _orderRepository.Update(order);
             var saved = await _orderRepository.SaveChangesAsync();
-
             if (saved)
             {
-                // Fire-and-forget email notification to customer
-                _ = Task.Run(async () =>
+                try
                 {
-                    try
+                    var email = await _userRepository.GetUserEmailAsync(order.UserId);
+                    var name = await _userRepository.GetUserNameAsync(order.UserId);
+                    if (!string.IsNullOrEmpty(email))
                     {
-                        var email = await _userRepository.GetUserEmailAsync(order.UserId);
-                        var name = await _userRepository.GetUserNameAsync(order.UserId);
-                        if (!string.IsNullOrEmpty(email))
-                        {
-                            await _emailService.SendOrderStatusUpdateEmailAsync(
-                                email,
-                                name ?? "Valued Customer",
-                                order.Id.ToString(),
-                                parsed.ToString()
-                            );
-                        }
+                        await _emailService.SendOrderStatusUpdateEmailAsync(
+                            email,
+                            name ?? "Valued Customer",
+                            order.Id.ToString(),
+                            parsed.ToString()
+                        );
                     }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"[EMAIL-UPDATE] ❌ Failed background email task: {ex.Message}");
-                    }
-                });
+                }
+                catch (Exception ex)
+                {
+                    // Just log it so the API response still succeeds even if email fails
+                    Console.WriteLine($"[EMAIL-UPDATE] ❌ Failed to send status update email: {ex.Message}");
+                }
             }
 
             return saved;
