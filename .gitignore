@@ -3,3 +3,7 @@
 **/obj/
 **/bin/
 *.sqlite
+
+# Ignore Local Configs & Fallbacks
+temp_emails/
+appsettings.Development.json
